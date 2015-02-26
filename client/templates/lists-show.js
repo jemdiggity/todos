@@ -40,10 +40,18 @@ Template.listsShow.helpers({
   todosReady: function() {
     return Router.current().todosHandle.ready();
   },
+	
+	roomsReady: function() {
+		return Router.current().roomsHandle.ready();
+	},
 
   todos: function(listId) {
     return Todos.find({listId: listId}, {sort: {createdAt : -1}});
-  }
+  },
+	
+	rooms: function(listId) {
+		return Rooms.find({listId: listId}, {sort: {createAt : -1}});
+	}
 });
 
 var editList = function(list, template) {
@@ -71,6 +79,10 @@ var deleteList = function(list) {
     Todos.find({listId: list._id}).forEach(function(todo) {
       Todos.remove(todo._id);
     });
+		Rooms.find({listId: list._id}).forEach(function(room) {
+			Rooms.remove(room._id);
+		});
+					
     Lists.remove(list._id);
 
     Router.go('home');
@@ -164,6 +176,27 @@ Template.listsShow.events({
       return;
     
     Todos.insert({
+      listId: this._id,
+      text: $input.val(),
+      checked: false,
+      createdAt: new Date()
+    });
+    Lists.update(this._id, {$inc: {incompleteCount: 1}});
+    $input.val('');
+  },
+	
+  'click .js-room-add': function(event, template) {
+    template.$('.js-room-new input').focus();
+  },
+
+  'submit .js-room-new': function(event) {
+    event.preventDefault();
+
+    var $input = $(event.target).find('[type=text]');
+    if (! $input.val())
+      return;
+    
+    Rooms.insert({
       listId: this._id,
       text: $input.val(),
       checked: false,

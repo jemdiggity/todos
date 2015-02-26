@@ -15,3 +15,10 @@ Meteor.publish('todos', function(listId) {
 
   return Todos.find({listId: listId});
 });
+
+Meteor.publish('rooms', function(listId) {
+	check(listId, String);
+	
+	return Rooms.find({listId: listId});
+});
+
